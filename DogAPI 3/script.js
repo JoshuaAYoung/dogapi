@@ -10,16 +10,27 @@ let url = "";
 
 function displayResults (responseJson) {
     $(".results").empty();
+    $(".error").empty();
     $(".results").append(
            `<img src="${responseJson.message}"/>`
     )
 }
 
+
+
 function getImages() {
     fetch(url)
-    .then(response => response.json())
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
     .then(responseJson => displayResults(responseJson))
-    .catch(error => alert('Something went wrong. Try again later.'))
+    .catch(err => {
+      $(".results").empty();
+      $('.error').html(`Incorrect breed`);
+    });
 }
 
 function getInput() {

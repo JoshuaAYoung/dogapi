@@ -9,6 +9,7 @@ let url = "";
 
 function displayResults (responseJson) {
     $(".results").empty();
+    $(".error").empty();
     for (let i = 0; i < responseJson.message.length; i++) {
         console.log(responseJson.message[i]);
         $(".results").append(
@@ -19,16 +20,30 @@ function displayResults (responseJson) {
 
 function getImages() {
     fetch(url)
-    .then(response => response.json())
-    .then(responseJson => displayResults(responseJson));
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then(responseJson => displayResults(responseJson))
+    .catch(err => {
+      $('.error').html(`Something went wrong: ${err.message}`);
+    });
 }
 
 function getInput() {
     $('.form').on('submit', function(event){
         event.preventDefault();
         dogNumber = $(this).find('input[name="number"]').val();
-        url = baseUrl + dogNumber;
-        getImages();
+        if (dogNumber <51 && dogNumber >= 1) {
+            url = baseUrl + dogNumber;
+            getImages();
+        }
+        else {
+            $(".results").empty();
+            $('.error').html("Choose a number between 1 and 50")
+        }
 })
 }
 
